@@ -1,0 +1,9 @@
+services:
+  mouse-chase-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mouse-chase-web
+    ports:
+      - "8080:80"
+    restart: unless-stopped

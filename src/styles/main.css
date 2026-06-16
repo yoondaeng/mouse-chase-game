@@ -1,0 +1,235 @@
+:root {
+	--bg1: #d9e8ff;
+	--bg2: #f5f9ff;
+	--bg3: #e8eef9;
+	--card-bg: rgba(255, 255, 255, 0.72);
+	--card-border: rgba(255, 255, 255, 0.85);
+	--ink: #1f2937;
+	--muted: #607087;
+	--line: #d6dde8;
+	--like-a: #2d8cff;
+	--like-b: #0d66dd;
+	--dislike-a: #ff6f7d;
+	--dislike-b: #ea3d53;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	color: var(--ink);
+	font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+	background:
+		radial-gradient(80vw 80vw at -5% -10%, #bdd8ff 0%, transparent 55%),
+		radial-gradient(60vw 60vw at 110% 110%, #d7e4ff 0%, transparent 52%),
+		linear-gradient(135deg, var(--bg1), var(--bg2) 45%, var(--bg3));
+}
+
+.page {
+	min-height: 100vh;
+	width: 100vw;
+}
+
+.card {
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.overlay {
+	position: absolute;
+	top: 18px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: min(760px, calc(100vw - 24px));
+	padding: 16px 20px 14px;
+	border-radius: 20px;
+	border: 1px solid var(--card-border);
+	background: var(--card-bg);
+	backdrop-filter: blur(18px) saturate(1.2);
+	-webkit-backdrop-filter: blur(18px) saturate(1.2);
+	box-shadow:
+		0 18px 40px rgba(34, 55, 84, 0.2),
+		0 2px 0 rgba(255, 255, 255, 0.85) inset;
+	animation: cardEnter 420ms ease-out;
+	z-index: 10;
+	pointer-events: none;
+}
+
+.window-bar {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	align-items: center;
+	gap: 12px;
+	padding: 2px 2px 14px;
+}
+
+.traffic-lights {
+	display: flex;
+	gap: 8px;
+}
+
+.dot {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, 0.65) inset, 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.dot-close {
+	background: #ff5f57;
+}
+
+.dot-min {
+	background: #febb2e;
+}
+
+.dot-max {
+	background: #28c840;
+}
+
+.window-title {
+	margin: 0;
+	justify-self: center;
+	font-size: 13px;
+	font-weight: 600;
+	color: #5f6f86;
+	letter-spacing: 0.01em;
+}
+
+h1 {
+	margin: 4px 0 6px;
+	font-size: clamp(28px, 3.2vw, 40px);
+	letter-spacing: -0.02em;
+}
+
+.subtitle {
+	margin: 0 0 18px;
+	font-size: 15px;
+	color: var(--muted);
+}
+
+.playground {
+	position: absolute;
+	inset: 0;
+	border-radius: 0;
+	border: 0;
+	background:
+		radial-gradient(220px 220px at 20% 30%, rgba(123, 170, 255, 0.2), transparent 72%),
+		radial-gradient(260px 220px at 80% 70%, rgba(255, 167, 178, 0.2), transparent 72%),
+		linear-gradient(160deg, rgba(255, 255, 255, 0.86), rgba(246, 249, 255, 0.92));
+	overflow: hidden;
+}
+
+.heart-drop {
+	position: absolute;
+	top: -12vh;
+	z-index: 1;
+	pointer-events: none;
+	user-select: none;
+	line-height: 1;
+	animation: heartRain var(--heart-duration, 1600ms) ease-in var(--heart-delay, 0ms) forwards;
+	filter: drop-shadow(0 4px 8px rgba(220, 53, 98, 0.26));
+}
+
+.btn {
+	border: 0;
+	border-radius: 999px;
+	color: #fff;
+	font-size: 17px;
+	font-weight: 700;
+	padding: 12px 24px;
+	cursor: pointer;
+	box-shadow: 0 10px 18px rgba(28, 46, 74, 0.22);
+	transition: transform 140ms ease, filter 140ms ease;
+}
+
+.btn:hover {
+	filter: brightness(1.05);
+}
+
+.btn:active {
+	transform: translateY(1px) scale(0.99);
+}
+
+.btn-like {
+	position: absolute;
+	left: calc(50% - 150px);
+	top: 58%;
+	background: linear-gradient(180deg, var(--like-a), var(--like-b));
+	z-index: 2;
+}
+
+.btn-dislike {
+	position: absolute;
+	left: calc(50% + 16px);
+	top: 58%;
+	background: linear-gradient(180deg, var(--dislike-a), var(--dislike-b));
+	z-index: 2;
+}
+
+.message {
+	margin: 0;
+	min-height: 24px;
+	font-size: 15px;
+	font-weight: 700;
+	color: #385174;
+}
+
+@keyframes cardEnter {
+	from {
+		opacity: 0;
+		transform: translateY(16px) scale(0.98);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes heartRain {
+	0% {
+		opacity: 0;
+		transform: translate3d(0, 0, 0) scale(0.7) rotate(-8deg);
+	}
+	12% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		transform: translate3d(var(--heart-drift, 0px), 120vh, 0) scale(1.22) rotate(18deg);
+	}
+}
+
+@media (max-width: 640px) {
+	.overlay {
+		top: 12px;
+		width: calc(100vw - 16px);
+		padding: 12px 14px;
+		border-radius: 14px;
+	}
+
+	h1 {
+		font-size: clamp(24px, 8vw, 32px);
+	}
+
+	.btn {
+		font-size: 16px;
+		padding: 10px 18px;
+	}
+
+	.btn-like {
+		left: calc(50% - 132px);
+		top: 64%;
+	}
+
+	.btn-dislike {
+		left: calc(50% + 8px);
+		top: 64%;
+	}
+}
