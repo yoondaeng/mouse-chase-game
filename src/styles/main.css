@@ -137,6 +137,17 @@ h1 {
 	filter: drop-shadow(0 4px 8px rgba(220, 53, 98, 0.26));
 }
 
+.fanfare-drop {
+	position: absolute;
+	top: -14vh;
+	z-index: 1;
+	pointer-events: none;
+	user-select: none;
+	line-height: 1;
+	animation: fanfareRain var(--fanfare-duration, 1800ms) ease-in-out var(--fanfare-delay, 0ms) forwards;
+	filter: drop-shadow(0 5px 10px rgba(39, 78, 134, 0.22));
+}
+
 .btn {
 	border: 0;
 	border-radius: 999px;
@@ -203,6 +214,20 @@ h1 {
 	100% {
 		opacity: 0;
 		transform: translate3d(var(--heart-drift, 0px), 120vh, 0) scale(1.22) rotate(18deg);
+	}
+}
+
+@keyframes fanfareRain {
+	0% {
+		opacity: 0;
+		transform: translate3d(0, 0, 0) scale(0.75) rotate(-15deg);
+	}
+	10% {
+		opacity: 1;
+	}
+	100% {
+		opacity: 0;
+		transform: translate3d(var(--fanfare-drift, 0px), 125vh, 0) scale(1.18) rotate(26deg);
 	}
 }
 

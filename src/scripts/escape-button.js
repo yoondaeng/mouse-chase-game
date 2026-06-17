@@ -19,11 +19,21 @@ export function wireEscapeButton(playground, dislikeButton, messageNode) {
 
 	function getBounds() {
 		const maxX = Math.max(EDGE_PADDING, playground.clientWidth - dislikeButton.offsetWidth - EDGE_PADDING);
-		const maxY = Math.max(EDGE_PADDING, playground.clientHeight - dislikeButton.offsetHeight - EDGE_PADDING);
+
+		let minY = EDGE_PADDING;
+		const overlayNode = playground.parentElement?.querySelector(".overlay");
+		if (overlayNode instanceof HTMLElement) {
+			const playgroundRect = playground.getBoundingClientRect();
+			const overlayRect = overlayNode.getBoundingClientRect();
+			const overlayBottomInPlayground = overlayRect.bottom - playgroundRect.top;
+			minY = Math.max(minY, Math.ceil(overlayBottomInPlayground) + EDGE_PADDING);
+		}
+
+		const maxY = Math.max(minY, playground.clientHeight - dislikeButton.offsetHeight - EDGE_PADDING);
 
 		return {
 			minX: EDGE_PADDING,
-			minY: EDGE_PADDING,
+			minY,
 			maxX,
 			maxY,
 			btnWidth: dislikeButton.offsetWidth,
@@ -148,12 +158,6 @@ export function wireEscapeButton(playground, dislikeButton, messageNode) {
 		moveTarget(nextLeft, nextTop);
 	}
 
-	function blockAndEscape(event) {
-		event.preventDefault();
-		event.stopPropagation();
-		jumpAway(event.clientX, event.clientY, true);
-	}
-
 	playground.addEventListener("mousemove", (event) => {
 		const bounds = getBounds();
 		const centerX = currentLeft + bounds.btnWidth / 2;
@@ -171,10 +175,9 @@ export function wireEscapeButton(playground, dislikeButton, messageNode) {
 		jumpAway(event.clientX, event.clientY, true);
 	});
 
-	dislikeButton.addEventListener("pointerdown", blockAndEscape, true);
-	dislikeButton.addEventListener("mousedown", blockAndEscape, true);
-	dislikeButton.addEventListener("click", blockAndEscape, true);
-	dislikeButton.addEventListener("touchstart", blockAndEscape, { capture: true, passive: false });
+	dislikeButton.addEventListener("pointerdown", (event) => {
+		jumpAway(event.clientX, event.clientY, true);
+	});
 
 	dislikeButton.addEventListener("focus", () => {
 		dislikeButton.blur();

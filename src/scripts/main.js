@@ -18,6 +18,7 @@ wireEscapeButton(
 );
 
 const HEART_EMOJIS = ["💖", "💗", "💘", "💕", "❤️", "🩷"];
+const FANFARE_EMOJIS = ["🎉", "🎊", "🥳", "✨", "🎺", "🎇"];
 
 function createHeartRain(target) {
 	const burstCount = 28;
@@ -47,10 +48,82 @@ function createHeartRain(target) {
 	}
 }
 
+function createFanfareRain(target) {
+	const burstCount = 34;
+
+	for (let index = 0; index < burstCount; index += 1) {
+		const fanfare = document.createElement("span");
+		fanfare.className = "fanfare-drop";
+		fanfare.textContent = FANFARE_EMOJIS[index % FANFARE_EMOJIS.length];
+
+		const left = Math.random() * 100;
+		const delay = Math.random() * 380;
+		const duration = 1400 + Math.random() * 1100;
+		const drift = -34 + Math.random() * 68;
+		const size = 18 + Math.random() * 20;
+
+		fanfare.style.left = `${left}%`;
+		fanfare.style.fontSize = `${size}px`;
+		fanfare.style.setProperty("--fanfare-delay", `${delay}ms`);
+		fanfare.style.setProperty("--fanfare-duration", `${duration}ms`);
+		fanfare.style.setProperty("--fanfare-drift", `${drift}px`);
+
+		target.appendChild(fanfare);
+
+		window.setTimeout(() => {
+			fanfare.remove();
+		}, delay + duration + 120);
+	}
+}
+
 likeButton.addEventListener("click", () => {
 	createHeartRain(playground);
 
 	if (message instanceof HTMLElement) {
-		message.textContent = "좋아! 편의점으로 출발!";
+		message.textContent = "좋아! 편의점에서 만나~";
 	}
 });
+
+let lastDislikeCelebrationAt = 0;
+
+function triggerDislikeCelebration() {
+	const now = Date.now();
+	if (now - lastDislikeCelebrationAt < 220) {
+		return;
+	}
+	lastDislikeCelebrationAt = now;
+
+	createFanfareRain(playground);
+
+	if (message instanceof HTMLElement) {
+		message.textContent = "축하합니다! 이걸 누르네?";
+	}
+}
+
+// Escape button moves on hover/down, so fire celebration on press as well.
+dislikeButton.addEventListener("pointerdown", triggerDislikeCelebration);
+dislikeButton.addEventListener("click", triggerDislikeCelebration);
+
+playground.addEventListener(
+	"pointerdown",
+	(event) => {
+		if (!(event.target instanceof Element)) {
+			return;
+		}
+
+		if (event.target.closest("#likeButton")) {
+			return;
+		}
+
+		const dislikeRect = dislikeButton.getBoundingClientRect();
+		const centerX = dislikeRect.left + dislikeRect.width / 2;
+		const centerY = dislikeRect.top + dislikeRect.height / 2;
+		const distance = Math.hypot(event.clientX - centerX, event.clientY - centerY);
+
+		// Allow users to see the effect even when the escape logic makes direct click too hard.
+		if (distance <= 190) {
+			triggerDislikeCelebration();
+		}
+	},
+	true
+);
