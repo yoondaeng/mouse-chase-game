@@ -18,6 +18,8 @@ export function wireEscapeButton(playground, dislikeButton, messageNode) {
 	let targetLeft = currentLeft;
 	let targetTop = currentTop;
 	let rafId = null;
+	let pointerClientX = Number.NaN;
+	let pointerClientY = Number.NaN;
 
 	function getBounds() {
 		const maxX = Math.max(EDGE_PADDING, playground.clientWidth - dislikeButton.offsetWidth - EDGE_PADDING);
@@ -165,7 +167,36 @@ export function wireEscapeButton(playground, dislikeButton, messageNode) {
 		jumpAway(event.clientX, event.clientY, true);
 	}
 
+	function rememberPointer(event) {
+		if (!Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) {
+			return;
+		}
+
+		pointerClientX = event.clientX;
+		pointerClientY = event.clientY;
+	}
+
+	function enforceDistanceFromPointer() {
+		if (!Number.isFinite(pointerClientX) || !Number.isFinite(pointerClientY)) {
+			return;
+		}
+
+		const bounds = getBounds();
+		const centerX = currentLeft + bounds.btnWidth / 2;
+		const centerY = currentTop + bounds.btnHeight / 2;
+		const areaRect = playground.getBoundingClientRect();
+		const localX = pointerClientX - areaRect.left;
+		const localY = pointerClientY - areaRect.top;
+		const distance = Math.hypot(localX - centerX, localY - centerY);
+
+		if (distance < DANGER_RADIUS + 18) {
+			jumpAway(pointerClientX, pointerClientY, true);
+		}
+	}
+
 	function onPointerMove(event) {
+		rememberPointer(event);
+
 		const bounds = getBounds();
 		const centerX = currentLeft + bounds.btnWidth / 2;
 		const centerY = currentTop + bounds.btnHeight / 2;
@@ -180,6 +211,8 @@ export function wireEscapeButton(playground, dislikeButton, messageNode) {
 
 	playground.addEventListener("mousemove", onPointerMove);
 	playground.addEventListener("pointermove", onPointerMove);
+	playground.addEventListener("pointerdown", rememberPointer, true);
+	playground.addEventListener("mousedown", rememberPointer, true);
 
 	dislikeButton.addEventListener("mouseenter", (event) => {
 		jumpAway(event.clientX, event.clientY, true);
@@ -192,7 +225,19 @@ export function wireEscapeButton(playground, dislikeButton, messageNode) {
 	dislikeButton.addEventListener("pointerdown", blockClickAttempt, true);
 	dislikeButton.addEventListener("mousedown", blockClickAttempt, true);
 	dislikeButton.addEventListener("click", blockClickAttempt, true);
+	dislikeButton.addEventListener("auxclick", blockClickAttempt, true);
+	dislikeButton.addEventListener("contextmenu", blockClickAttempt, true);
 	dislikeButton.addEventListener("touchstart", blockClickAttempt, { capture: true, passive: false });
+
+	playground.addEventListener(
+		"contextmenu",
+		(event) => {
+			event.preventDefault();
+			event.stopPropagation();
+			enforceDistanceFromPointer();
+		},
+		true
+	);
 
 	dislikeButton.addEventListener("focus", () => {
 		dislikeButton.blur();
@@ -211,6 +256,8 @@ export function wireEscapeButton(playground, dislikeButton, messageNode) {
 		placeNow(currentLeft, currentTop);
 		jumpAway(Number.NaN, Number.NaN, true);
 	});
+
+	window.setInterval(enforceDistanceFromPointer, 90);
 
 	placeNow(dislikeButton.offsetLeft, dislikeButton.offsetTop);
 }
