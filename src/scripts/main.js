@@ -1,5 +1,36 @@
 import { wireEscapeButton } from "./escape-button.js";
 
+document.addEventListener(
+	"contextmenu",
+	(event) => {
+		event.preventDefault();
+		event.stopPropagation();
+	},
+	true
+);
+
+document.addEventListener(
+	"mousedown",
+	(event) => {
+		if (event.button === 2) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	},
+	true
+);
+
+document.addEventListener(
+	"auxclick",
+	(event) => {
+		if (event.button === 2) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	},
+	true
+);
+
 const playground = document.getElementById("playground");
 const likeButton = document.getElementById("likeButton");
 const dislikeButton = document.getElementById("dislikeButton");
